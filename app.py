@@ -66,7 +66,7 @@ def recive():
 
 @app.route('/download')
 def download():
-	path = "walker.png"
+	path = "BrokenLinks.csv"
 	return send_file(path, as_attachment=True)
 
 
