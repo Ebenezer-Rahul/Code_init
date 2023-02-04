@@ -1,0 +1,46 @@
+body {
+    font-family: Arial;
+    margin: 0;
+  }
+  
+  /* Header/Logo Title */
+  .header {
+    padding: 10px;
+    text-align: center;
+    background: #1abc9c;
+    color: white;
+    font-size: 30px;
+  }
+  
+  /* Page Content */
+  .content {padding:20px;}
+
+body {  
+    background:#ddd;  
+    }  
+    .form-control-borderless {  
+        border: none;  
+    }  
+    .form-control-borderless:focus {  
+        border: none;  
+        outline: none;  
+        box-shadow: none;  
+    }  
+    .form-control-borderless:hover {  
+        border: none;  
+        outline: none;  
+        box-shadow: none;  
+    }  
+    .form-control-borderless:active {  
+        border: none;  
+        outline: none;  
+        box-shadow: none;  
+    }  
+    h5 {  
+        font-family: 'Indie Flower', cursive;  
+        font-size: 32px;  
+      color: gray;  
+      font-weight: bold;  
+      text-align: center;  
+    }  
+    
