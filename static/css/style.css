@@ -13,21 +13,22 @@ body {
     font-size: 30px;
   }
 
+
   /* Page Content */
   .content {padding:20px;}
 
   .input {
-      margin-top : 206px;
+      margin-top : 100px;
       padding:0px;
       height : 80px;
       width : 850px;
       background-color : #F7EFE5;
       border-radius : 20px;
-      box-shadow: 100px ; !important
+      box-shadow: 100px ;
   }
 
   .spacer {
-    padding-top : 81px;
+    padding-top : 0px;
   }
 
   .scrape {
@@ -90,3 +91,11 @@ body {
       text-align: center;  
     }  
     
+    .my-custom-scrollbar {
+        position: relative;
+        height: 300px;
+        overflow: auto;
+        }
+        .table-wrapper-scroll-y {
+        display: block;
+        }
