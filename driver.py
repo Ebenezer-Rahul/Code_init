@@ -35,19 +35,23 @@ unvisited_links = Queue()
 
 processed_links = {}
 
-Domain = "https://beautiful-soup-4.readthedocs.io"
+Domain = "https://beautiful-soup-4.readthedocs.io/"
 
-threads = []
+threads = Queue()
+max_threads = 30
 
 queue_lock = threading.Semaphore(1)
 sync_lock = threading.Semaphore(1)
 dict_lock = threading.Semaphore(1)
 lock = threading.Semaphore(1)
 
+thread_count = None
+
 def driver(domain) :
 
     global Domain 
     global unvisited_links
+    global thread_count
 
     global queue_lock
     global sync_lock
@@ -63,26 +67,46 @@ def driver(domain) :
     i = 0
 
     while True :
-       
-        sync_lock.acquire()
+
+        queue_lock.acquire()
+        if thread_count == 0 and unvisited_links.qsize() == 0 :
+            break
+        queue_lock.release()
+
+        if threads.qsize() > max_threads :
+            while not threads.empty() :
+                threads.get().join()
+                print("joinded")
+        
+
+        if thread_count == None :
+            thread_count = 0
+    
+
 
         queue_lock.acquire()
 
-        if unvisited_links.empty() : 
-            break
-        
+        if unvisited_links.qsize() <= 0 and thread_count > 0 :
+            queue_lock.release()
+            continue
+
         current_link = unvisited_links.get()
 
         queue_lock.release()
 
-        # generateLinks(current_link)
 
         thread = threading.Thread(target=generateLinks, args=(i,current_link))
+        # generateLinks(i,current_link)
         i = i + 1
-        print(current_link) 
+
         thread.start()
 
-        threads.append(thread)
+        queue_lock.acquire()
+        thread_count += 1
+        queue_lock.release()
+
+        threads.put(thread)
+        
 
         # if not generateLinks(current_link) :
             # print("Broken Link")
@@ -94,8 +118,8 @@ def driver(domain) :
 
         pass
 
-    for thread in threads :
-        thread.join()
+    while threads.qsize() > 0:
+        threads.get().join()
         print("joined")
 
     pass
@@ -111,6 +135,7 @@ def generateLinks(i,ele):
     global dict_lock
     global processed_links
     global unvisited_links
+    global thread_count
     
     queue_lock.acquire()
     processed_links[ele] = True
@@ -122,9 +147,16 @@ def generateLinks(i,ele):
     response = requests.get(current_link)
 
     if error_codes.get(response.status_code) != None :
+        print(current_link, "error")
+        queue_lock.acquire()
+        thread_count -= 1
+        queue_lock.release()
         return False
 
     if not isValid :
+        queue_lock.acquire()
+        thread_count -= 1
+        queue_lock.release()
         return True
 
     ## BeautifulSoup Parsing
@@ -152,7 +184,10 @@ def generateLinks(i,ele):
             sync_lock.release()
 
         queue_lock.release()
-
+    
+    queue_lock.acquire()
+    thread_count -= 1
+    queue_lock.release()
     return True
 
 def filterLinks(soup) :
@@ -176,11 +211,58 @@ def filterLinks(soup) :
            yield (Domain + link_tag['href'], True)
 
 
+    link_tags = soup.find_all('link')
+    for link_tag in link_tags :
+        
+        if link_tag.get('href') == None or len(link_tag['href']) == 0 or  link_tag['href'][0] == "#":
+            continue
+
+        if link_tag['href'][0] == '_':
+            continue
+
+        if len(link_tag) >= 4 and link_tag["href"][0 : 5] == "http" :
+            yield (link_tag['href'] , False)
+        
+        if link_tag['href'][0] == '/' or link_tag['href'][0] == '.':
+           yield (Domain + link_tag['href'], True)
+
+    link_tags = soup.find_all('img')
+    for link_tag in link_tags :
+        
+        if link_tag.get('src') == None or len(link_tag['src']) == 0 or  link_tag['src'][0] == "#":
+            continue
+
+        if link_tag['src'][0] == '_':
+            continue
+
+        if len(link_tag) >= 4 and link_tag["src"][0 : 5] == "http" :
+            yield (link_tag['src'] , False)
+        
+        if link_tag['src'][0] == '/' or link_tag['src'][0] == '.':
+           yield (Domain + link_tag['src'], True)
+
+    link_tags = soup.find_all('script')
+    for link_tag in link_tags :
+        
+        if link_tag.get('src') == None or len(link_tag['src']) == 0 or  link_tag['src'][0] == "#":
+            continue
+
+        if link_tag['src'][0] == '_':
+            continue
+
+        if len(link_tag) >= 4 and link_tag["src"][0 : 5] == "http" :
+            yield (link_tag['src'] , False)
+        
+        if link_tag['src'][0] == '/' or link_tag['src'][0] == '.':
+           yield (Domain + link_tag['src'], True)
+
+
+
     yield None
 
 
-print("hello")
+# print("hello")
 
-driver(Domain)
+driver("https://dss.nitc.ac.in")
 
 print(unvisited_links)
