@@ -4,6 +4,10 @@ body {
     margin: 0;
   }
   
+
+  td {
+      font-size:130%;
+  }
   /* Header/Logo Title */
   .header {
     padding: 10px;

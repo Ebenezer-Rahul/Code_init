@@ -1,0 +1,16 @@
+"('link', 'status_code')"
+https://toscrape.com/,200
+http://books.toscrape.com,200
+http://quotes.toscrape.com/,200
+http://quotes.toscrape.com,200
+http://quotes.toscrape.com/scroll,200
+http://quotes.toscrape.com/js,200
+http://quotes.toscrape.com/js-delayed,200
+http://quotes.toscrape.com/tableful,200
+http://quotes.toscrape.com/login,200
+http://quotes.toscrape.com/search.aspx,200
+http://quotes.toscrape.com/random,200
+https://toscrape.com//./css/bootstrap.min.css,200
+https://toscrape.com//./css/main.css,200
+https://toscrape.com//./img/books.png,200
+https://toscrape.com//./img/quotes.png,200

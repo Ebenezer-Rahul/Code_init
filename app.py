@@ -1,4 +1,5 @@
 from flask import Flask,render_template,request,url_for,redirect,send_file, jsonify
+import csv
 
 app=Flask(__name__)
 
@@ -20,6 +21,9 @@ responses = Queue()
 
 processed_links = {}
 
+all_links = []
+all_status_codes = []
+
 done = False
 
 Domain = "https://beautiful-soup-4.readthedocs.io/"
@@ -28,6 +32,7 @@ myLock = None
 
 thread_count = None
 
+total_links = 1;
 
 
 @app.route("/",methods=["POST","GET"])
@@ -35,12 +40,19 @@ def home():
     global mythread
     global done
     global myLock
+    global total_links
     # driver("https://toscrape.com/")
-    myLock = 1
-    print(myLock)
-    myLock = threading.Semaphore(1)
-    mythread = threading.Thread(target=driver, args=("https://www.nba.com",))
-    mythread.start()
+    print("hi")
+    if request.method == "POST" :
+        print(request.form)
+        my_domain = request.form["domain"]
+        print("Why")
+        print(my_domain)
+        myLock = threading.Semaphore(1)
+        mythread = threading.Thread(target=driver, args=(my_domain,))
+        mythread.start()
+        return redirect("/") 
+
     return render_template("index.html")
 
 @app.route('/recive', methods=["POST", "GET"])
@@ -49,16 +61,18 @@ def recive():
     global responses
     global done
     global myLock
-
+    if myLock == None :
+        return jsonify({"done" : "bro"})
     myLock.acquire()
     if done : 
         # mythread.join()
         myLock.release()
-        return jsonify({"done" : "bro"})
+        # return jsonify({"done" : "bro"})
+        return jsonify({ "isLink" : 0, "isDone" : 1, "link" : "null", "status_code" : 0, "total_links" : total_links});
 
     if responses.empty() : 
         myLock.release()
-        return jsonify({"mess" : 1}) 
+        return jsonify({ "isLink" : 0, "isDone" : 0, "link" : "null", "status_code" : 0, "total_links" : total_links});
 
     res = responses.get()
     myLock.release()
@@ -66,30 +80,15 @@ def recive():
 
 @app.route('/download')
 def download():
-	path = "BrokenLinks.csv"
-	return send_file(path, as_attachment=True)
+    path = "BrokenLinks.csv"
+    rows = zip(all_links, all_status_codes)
+    with open("BrokenLinks.csv","w",encoding='UTF8', newline='') as f :
+        writer = csv.writer(f)
+        writer.writerow(zip(["link"] ,["status_code"]))
+        for row in rows :
+            writer.writerow(row)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return send_file(path, as_attachment=True)
 
 
 
@@ -110,7 +109,10 @@ def driver(domain) :
     global Domain 
     global unvisited_links
     global responses 
+    global all_links
+    global all_status_codes
     global done
+    global links
     global myLock
 
     print(myLock, "hello")
@@ -136,13 +138,16 @@ def driver(domain) :
 
         i = i + 1
         
+        # total_links += 1
         current_response = {
                 "isLink" : 1,
                 "isDone" : 0,
                 "link" : link,
-                "status_code" : status_code
+                "status_code" : status_code,
+                "total_links" : total_links
                 }
-
+        all_links.append(link) 
+        all_status_codes.append(status_code) 
         myLock.acquire()
         responses.put(current_response)
         print(link)
@@ -173,6 +178,7 @@ def generateLinks(i,ele):
 
     global processed_links
     global unvisited_links
+    global total_links
     
     processed_links[ele] = True
     
@@ -211,6 +217,7 @@ def generateLinks(i,ele):
             break
 
         if processed_links.get(link) == None :
+            total_links += 1
             processed_links[link] = True
             unvisited_links.put(link)
     
@@ -293,17 +300,6 @@ def match(mylink) :
             return True
 
     return False
-
-
-
-
-
-
-
-
-
-
-
 
 
 
