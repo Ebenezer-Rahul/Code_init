@@ -1,0 +1,93 @@
+body {
+    font-family: Arial;
+    background-color : #ECEEEE;
+    margin: 0;
+  }
+  
+  /* Header/Logo Title */
+  .header {
+    padding: 10px;
+    text-align: center;
+    background: #1abc9c;
+    color: white;
+    font-size: 30px;
+  }
+
+
+  /* Page Content */
+  .content {padding:20px;}
+
+  .input {
+      margin-top : 100px;
+      padding:0px;
+      height : 80px;
+      width : 850px;
+      background-color : #F7EFE5;
+      border-radius : 20px;
+      box-shadow: 100px ;
+  }
+
+  .spacer {
+    padding-top : 0px;
+  }
+
+  .scrape {
+      padding-top : auto;
+      padding-bottom : auto;
+      height : 56px;
+      background-color : #1C82AD;
+      width : 143px;
+      font-size : 20px;
+      color: #FFFFFF;
+      border-radius : 20px;
+  }
+
+  .linkicon {
+      margin-top:0px;
+      margin-left:8px;
+      margin-right:8px;
+      height : 44px;
+      width : 43px;
+
+  }
+  #mydomain {
+      border: none;
+      margin-left : 10px;
+      margin-right : 25px;
+      margin-top :15px;
+      font-size : 20px;
+      background-color : #F7EFE5;
+      width : 600px;
+      height :50px;
+  }
+
+
+body {  
+    background:#ddd;  
+    }  
+    .form-control-borderless {  
+        border: none;  
+    }  
+    .form-control-borderless:focus {  
+        border: none;  
+        outline: none;  
+        box-shadow: none;  
+    }  
+    .form-control-borderless:hover {  
+        border: none;  
+        outline: none;  
+        box-shadow: none;  
+    }  
+    .form-control-borderless:active {  
+        border: none;  
+        outline: none;  
+        box-shadow: none;  
+    }  
+    h5 {  
+        font-family: 'Indie Flower', cursive;  
+        font-size: 32px;  
+      color: gray;  
+      font-weight: bold;  
+      text-align: center;  
+    }  
+    
