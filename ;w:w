@@ -1,0 +1,27 @@
+from flask import Flask,render_template,request,url_for,redirect,send_file, jsonify
+
+from driver import driver, responses
+app=Flask(__name__)
+
+mythread = None
+
+@app.route("/",methods=["POST","GET"])
+def home():
+    global mythread
+    driver("https://toscrape.com/")
+    mythread = threading.Thread()
+    return render_template("index.html")
+
+@app.route('/recive', methods=["POST", "GET"])
+def recive():
+    path = "walker.png"
+    if responses.empty() : 
+        return jsonify({"mess" : 1}) 
+    return jsonify(responses.get())
+
+@app.route('/download')
+def download():
+	path = "walker.png"
+	return send_file(path, as_attachment=True)
+
+app.run(debug=True)

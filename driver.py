@@ -1,4 +1,3 @@
-
 import logging
 
 import threading
@@ -24,10 +23,15 @@ error_codes = {
 
 unvisited_links = Queue()
 
+responses = Queue()
+
 processed_links = {}
+
+done = False
 
 Domain = "https://beautiful-soup-4.readthedocs.io/"
 
+myLock = None
 
 thread_count = None
 
@@ -35,7 +39,11 @@ def driver(domain) :
 
     global Domain 
     global unvisited_links
+    global responses 
+    global done
+    global myLock
 
+    print(myLock, "hello")
     Domain = domain + '/'
 
     assert(type(domain) == str)
@@ -51,10 +59,21 @@ def driver(domain) :
 
         current_link = unvisited_links.get()
 
-        print(generateLinks(i,current_link))
+        link, status_code = generateLinks(i,current_link)
 
         i = i + 1
+        
+        current_response = {
+                "isLink" : 1,
+                "isDone" : 0,
+                "link" : link,
+                "status_code" : status_code
+                }
 
+        myLock.acquire()
+        responses.put(current_response)
+        myLock.release()
+        
         # if not generateLinks(current_link) :
             # print("Broken Link")
             # createJsonObject()
@@ -65,6 +84,11 @@ def driver(domain) :
 
         pass
 
+    myLock.acquire()
+    responses.put({"isLink" : 0, "isDone" : 1, "link" : "null", "status_code" : 0 })
+    myLock.release()
+
+    done = True
     pass
 
 
@@ -186,7 +210,7 @@ def filterLinks(soup) :
            yield (Domain + link_tag['src'], True)
 
 
-
+    # print("What")
     yield None
 
 
@@ -200,6 +224,6 @@ def match(mylink) :
 # print("hello")
 
 # driver("http://example.webscraping.com//")
-driver("https://toscrape.com/")
+# driver("https://toscrape.com/")
 
 # print(unvisited_links)
